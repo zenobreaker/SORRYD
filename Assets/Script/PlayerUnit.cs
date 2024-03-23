@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-
+using UnityEngine.UIElements;
+using UnityEngine.Video;
 
 public enum UnitType
 {
@@ -41,7 +42,9 @@ public class PlayerUnit : MonoBehaviour
     private Transform targetTr; 
 
     Vector2 destination = Vector2.zero;
-    Coroutine attackCoroutine; 
+    Coroutine attackCoroutine;
+
+    bool isAttacking = false; 
 
     public void Awake()
     {
@@ -51,7 +54,7 @@ public class PlayerUnit : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        isAttacking = false; 
     }
 
     // Update is called once per frame
@@ -67,7 +70,7 @@ public class PlayerUnit : MonoBehaviour
         }   
         else if(state == State.ATTACK)
         {
-
+            Attack();
         }
     }
 
@@ -90,6 +93,7 @@ public class PlayerUnit : MonoBehaviour
         state = State.IDLE; 
 
     }
+
 
     // 지정한 위치에 도착했는지 검사 
     public void CheckArrive()
@@ -159,7 +163,14 @@ public class PlayerUnit : MonoBehaviour
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, attackRange);
         if(colliders.Length >0)
         {
-            SetTarget(colliders[0].transform);
+            foreach(var collider in colliders)
+            {
+                if(collider.transform.CompareTag("Enemy"))
+                {
+                    SetTarget(colliders[0].transform);
+                    break; 
+                }
+            }
         }
     }
 
@@ -173,9 +184,10 @@ public class PlayerUnit : MonoBehaviour
     // 공격
     public void Attack()
     {
-        if(targetTr != null)
+        if(targetTr != null && isAttacking == false)
         {
             // 적을 향해 오브젝트 발사 
+            ShootBullet(targetTr);
         }
         else
         {
@@ -183,11 +195,34 @@ public class PlayerUnit : MonoBehaviour
         }
     }
 
-    IEnumerator ShootBullet(Transform target)
+    void ShootBullet(Transform target)
     {
         if (bulletPrafab == null || target == null)
-            yield break; 
+            return;
 
-        
+        var bulletObj = Instantiate(bulletPrafab, transform.position, Quaternion.identity);
+
+        if(bulletObj.TryGetComponent<Bullet>(out var bullet))
+        {
+            bullet.SetTarget(target);
+        }
+
+        if(attackCoroutine == null)
+            attackCoroutine = StartCoroutine(DelayAttackTime());
+    }
+
+    // 딜레이 코루틴
+    IEnumerator DelayAttackTime()
+    {
+        isAttacking = true; 
+        yield return new WaitForSeconds(attackSpeed);
+        isAttacking = false;
+        attackCoroutine = null; 
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }
