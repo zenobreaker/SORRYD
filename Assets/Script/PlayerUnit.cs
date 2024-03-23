@@ -75,9 +75,20 @@ public class PlayerUnit : MonoBehaviour
     {
         if(rb != null && state == State.MOVE)
         {
-            rb.MovePosition(rb.position + destination);
+            Vector2 dirVec = (destination - rb.position).normalized;
+            Vector2 nextVec = moveSpeed * Time.fixedDeltaTime * dirVec; 
+
+            rb.MovePosition(rb.position + nextVec);
+            rb.velocity = Vector2.zero;
             CheckArrive();
         }
+    }
+
+
+    public void UnitSetUp()
+    {
+        state = State.IDLE; 
+
     }
 
     // 지정한 위치에 도착했는지 검사 
@@ -87,8 +98,9 @@ public class PlayerUnit : MonoBehaviour
             return;
 
         // 목표 지점에 도착 했는지 검사 
-        if (Vector2.Distance(transform.position, destination) > 0.02f * moveSpeed)
+        if (Vector2.Distance(transform.position, destination) < 0.02f * moveSpeed)
         {
+            Debug.Log("도착 : " + Vector2.Distance(transform.position, destination));
             state = State.IDLE;
             return;
         }
@@ -103,19 +115,25 @@ public class PlayerUnit : MonoBehaviour
         float distance = Vector2.Distance(transform.position, destination);
 
         // 대상 위치와 현 재 위치 사이의 거리가 일정 거리 이내일 때
-        if (distance < 10)
+        if (distance < 2)
         {
             // 대상 위치에 다른 유닛이 있는지 확인
-            Collider2D[] collider2Ds = Physics2D.OverlapCircleAll(destination, 10);
+            Collider2D[] collider2Ds = Physics2D.OverlapCircleAll(destination, 2);
 
 
-            // 다른 유닛이 있으면
+            // 다른  유닛이 있으면
             if(collider2Ds.Length > 0)
             {
                 // 가장 가까운 유닛을 찾아서 그 근처를 도착지로 조정
                 Vector2 closestPosition = collider2Ds[0].transform.position;
+                bool isAnother = true; 
                 foreach(var collider in collider2Ds)
                 {
+                    if(collider.transform == this.transform)
+                    {
+                        isAnother = false; 
+                        continue; 
+                    }
                     float distToTarget = Vector2.Distance(collider.transform.position, destination);
                     float distToClosest = Vector2.Distance(closestPosition, destination);
                     if (distToTarget < distToClosest)
@@ -123,7 +141,12 @@ public class PlayerUnit : MonoBehaviour
                         closestPosition = collider.transform.position;
                     }
                 }
-                destination = closestPosition;
+
+                if (isAnother == true)
+                {
+                    Debug.Log("계산처리");
+                    destination = closestPosition;
+                }
             }
         }
 

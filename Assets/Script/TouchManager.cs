@@ -11,7 +11,7 @@ public class TouchManager : MonoBehaviour
 
     private Camera mainCamera;
     private Ray ray;
-    private RaycastHit hit;
+    private RaycastHit2D hit;
 
     public GameObject selectUnit;
 
@@ -26,33 +26,32 @@ public class TouchManager : MonoBehaviour
 
     public void Update()
     {
-        if(Input.touchCount > 0)
+        if (Input.touchCount > 0)
         {
             // 첫 번째 터치 가져오기 
-            Touch touch = Input.GetTouch(0);    
+            Touch touch = Input.GetTouch(0);
 
             // 터치 위치를 화면 좌표에서 월드 좌표로 반환
             Vector2 touchPoistion = Camera.main.ScreenToWorldPoint(touch.position);
 
             Debug.Log("터치한 위치 : " + touchPoistion);
-          
+
         }
 
-        if(Input.GetMouseButtonDown(0) == true)
+        if (Input.GetMouseButtonDown(0) == true)
         {
             Vector2 mousePosition = Input.mousePosition;
             //
-            ray = mainCamera.ScreenPointToRay(mousePosition);
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+            var worldPoint = mainCamera.ScreenToWorldPoint(mousePosition);
+            hit = Physics2D.Raycast(worldPoint, Vector2.zero);
+
+            if (hit.collider != null && hit.transform.CompareTag("Unit"))
             {
-                if(hit.transform.CompareTag("Unit"))
-                {
-                    SelectUnit(hit.transform);
-                }
-                else if(hit.transform.CompareTag("Ground"))
-                {
-                    MoveSelectedUnit(mousePosition);
-                }
+                SelectUnit(hit.transform);
+            }
+            else 
+            {
+                MoveSelectedUnit(mousePosition);
             }
         }
     }
@@ -65,6 +64,7 @@ public class TouchManager : MonoBehaviour
             selectUnit = null; 
             return; 
         }
+        Debug.Log("유닛 선택 : " + transform.name); 
         selectUnit = transform.gameObject;
     }
 
@@ -77,7 +77,7 @@ public class TouchManager : MonoBehaviour
             return;
 
         Vector2 vector2 = Camera.main.ScreenToWorldPoint(position);
-        Debug.Log("지형 선택 ");
+        Debug.Log("선택한 유닛을 이동시킬 지형 선택 ");
         // 해당 유닛을 선택한 곳으로 옮기도록 한다.
         var pu = selectUnit.GetComponent<PlayerUnit>();
         if (pu != null)
