@@ -12,7 +12,7 @@ public enum BulletType
 
 
 // 대상을 향해 날아가는 총알 오브젝트 
-public class Bullet : MonoBehaviour
+public class BulletObject : MonoBehaviour
 {
     public Transform target;
     public SpriteRenderer sprite;

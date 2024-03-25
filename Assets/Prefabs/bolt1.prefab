@@ -134,6 +134,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  sprite: {fileID: 168565440303376694}
   speed: 5
   power: 0
   bomoEffect: {fileID: 0}

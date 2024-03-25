@@ -202,7 +202,7 @@ public class PlayerUnit : MonoBehaviour
 
         var bulletObj = Instantiate(bulletPrafab, transform.position, Quaternion.identity);
 
-        if(bulletObj.TryGetComponent<Bullet>(out var bullet))
+        if(bulletObj.TryGetComponent<BulletObject>(out var bullet))
         {
             bullet.SetTarget(target);
         }
