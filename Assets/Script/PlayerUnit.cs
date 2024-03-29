@@ -4,12 +4,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.Video;
+using Redcode.Pools;
 
-public enum UnitType
-{
-    SPEED_TYPE,
-    POWER_TYPE,
-}
+
 
 public enum State
 {
@@ -19,31 +16,22 @@ public enum State
 }
 
 
-public class PlayerUnit : MonoBehaviour
+public class PlayerUnit : ObjectPoolInfo, IPoolObject
 {
-    public int attack;              // 공격력
-    public int additionalAttack;    // 추가 공격력
-    public float attackSpeed;       // 공격속도
-    public float additionalAttackSpeed; // 추가 공격속도
-    public float attackRange;       // 공격 사거리
-
-    public int rank;
-    public int value; 
-
-
-    public UnitType type;
+    public UnitStatInfo unitInfo;
+    public int upgradeCount; 
 
     public State state; 
 
     public int moveSpeed;
 
-    public GameObject bulletPrafab; 
+    public ObjectPoolInfo bulletObject; 
     public Rigidbody2D rb;
     private Transform targetTr; 
 
     Vector2 destination = Vector2.zero;
     Coroutine attackCoroutine;
-
+    public LayerMask targetLayer;
     bool isAttacking = false; 
 
     public void Awake()
@@ -51,13 +39,11 @@ public class PlayerUnit : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         isAttacking = false; 
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(state  == State.IDLE)
@@ -86,7 +72,14 @@ public class PlayerUnit : MonoBehaviour
             CheckArrive();
         }
     }
+    public void OnCreatedInPool()
+    {
+    }
 
+    public void OnGettingFromPool()
+    {
+        UnitSetUp();
+    }
 
     public void UnitSetUp()
     {
@@ -104,7 +97,7 @@ public class PlayerUnit : MonoBehaviour
         // 목표 지점에 도착 했는지 검사 
         if (Vector2.Distance(transform.position, destination) < 0.02f * moveSpeed)
         {
-            Debug.Log("도착 : " + Vector2.Distance(transform.position, destination));
+            //Debug.Log("도착 : " + Vector2.Distance(transform.position, destination));
             state = State.IDLE;
             return;
         }
@@ -160,14 +153,15 @@ public class PlayerUnit : MonoBehaviour
     // 대상이 자신의 공격 범위에 있는지 검사
     public void CheckRangeInEnemy()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, attackRange);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, unitInfo.attackRange,
+            targetLayer);
         if(colliders.Length >0)
         {
             foreach(var collider in colliders)
             {
                 if(collider.transform.CompareTag("Enemy"))
                 {
-                    SetTarget(colliders[0].transform);
+                    SetTarget(collider.transform);
                     break; 
                 }
             }
@@ -195,15 +189,38 @@ public class PlayerUnit : MonoBehaviour
         }
     }
 
+
+    int CalcUnitPower()
+    {
+        if (unitInfo == null)
+            return 0;
+        // 공격력 계산 ( 기본 공격력 ) + (강화 수 * 등급별 공격력 상승량)
+        int upgrade = 0; 
+        if(PlayUnitManager.instance != null)
+        {
+            upgrade = PlayUnitManager.instance.GetUpgradeCount(unitInfo.unitType);
+        }
+
+        return unitInfo.attack + (upgrade * unitInfo.additionalAttack);
+    }
+
+    float CalcUnitAttackSpeed()
+    {
+        return unitInfo.attackSpeed + unitInfo.additionalAttackSpeed;
+    }
+
+
     void ShootBullet(Transform target)
     {
-        if (bulletPrafab == null || target == null)
+        if (bulletObject == null || target == null)
             return;
 
-        var bulletObj = Instantiate(bulletPrafab, transform.position, Quaternion.identity);
-
-        if(bulletObj.TryGetComponent<BulletObject>(out var bullet))
+        //var bulletObj = Instantiate(bulletPrafab, transform.position, Quaternion.identity);
+        var bulletObj = Manager.Instance.Spawn(bulletObject.idName);
+        bulletObj.transform.position = this.transform.position;
+        if (bulletObj.TryGetComponent<BulletObject>(out var bullet))
         {
+            bullet.SetPower(CalcUnitPower()); 
             bullet.SetTarget(target);
         }
 
@@ -215,7 +232,7 @@ public class PlayerUnit : MonoBehaviour
     IEnumerator DelayAttackTime()
     {
         isAttacking = true; 
-        yield return new WaitForSeconds(attackSpeed);
+        yield return new WaitForSeconds(CalcUnitAttackSpeed());
         isAttacking = false;
         attackCoroutine = null; 
     }
@@ -223,6 +240,8 @@ public class PlayerUnit : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
+        Gizmos.DrawWireSphere(transform.position, unitInfo.attackRange);
     }
+
+  
 }

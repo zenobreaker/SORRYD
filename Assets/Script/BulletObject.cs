@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Redcode.Pools;
 
 public enum BulletType
 { 
@@ -12,17 +13,26 @@ public enum BulletType
 
 
 // 대상을 향해 날아가는 총알 오브젝트 
-public class BulletObject : MonoBehaviour
+public class BulletObject : ObjectPoolInfo, IPoolObject
 {
     public Transform target;
     public SpriteRenderer sprite;
-    
 
     public float speed; // 총알 속도
     public int power;     // 총알 위력
     public GameObject bomoEffect; // 폭발 이펙트 
     public BulletType type;
 
+
+    public void OnCreatedInPool()
+    {
+
+    }
+
+    public void OnGettingFromPool()
+    {
+
+    }
 
     private void Awake()
     {
@@ -48,8 +58,8 @@ public class BulletObject : MonoBehaviour
             transform.Translate(speed * Time.deltaTime * dirVec, Space.World); 
             if(ArriveToTarget())
             {
-                // 총알 삭제
-                Destroy(this.gameObject);
+                // 오브젝트 반납 
+                Manager.Instance.ReturnPool(this);
             }
         }
     }
@@ -63,10 +73,16 @@ public class BulletObject : MonoBehaviour
         return true; 
     }
 
+    public void SetPower(int power)
+    {
+        this.power = power; 
+    }
+
     public void SetTarget(Transform transform)
     {
         if (transform == null) return;
 
         this.target = transform;
     }
+
 }

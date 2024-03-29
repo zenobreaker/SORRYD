@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f75329ca48104d546a03f3ffeaf56a33, type: 3}
+  m_Name: UnitData
+  m_EditorClassIdentifier: 
+  maxUpgrade: 99
+  gradeInfoList:
+  - grade: 0
+    sellingValue: 2
+  - grade: 1
+    sellingValue: 4
+  - grade: 2
+    sellingValue: 8
+  - grade: 3
+    sellingValue: 12
+  - grade: 4
+    sellingValue: 20

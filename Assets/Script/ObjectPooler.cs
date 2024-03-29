@@ -1,18 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Redcode.Pools;
 
-public class ObjectPooler : MonoBehaviour
+public abstract class ObjectPoolInfo : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public string idName;
+}
+
+
+public class ObjectPooler : Manager
+{
+    PoolManager poolManager;
+
+    protected override void Awake()
     {
-        
+        base.Awake();
+        poolManager = GetComponent<PoolManager>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public override ObjectPoolInfo Spawn(string name)
     {
-        
+        return poolManager.GetFromPool<ObjectPoolInfo>(name);
     }
+
+    public override void ReturnPool(ObjectPoolInfo clone)
+    {
+        poolManager.TakeToPool<ObjectPoolInfo>(clone.idName, clone);
+    }
+
 }

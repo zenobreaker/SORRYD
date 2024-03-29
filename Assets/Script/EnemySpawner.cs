@@ -8,7 +8,7 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField]
-    private GameObject[] enemyPrafab; // 적 프리팹
+    private ObjectPoolInfo[] enemyInfos; // 적 프리팹
     [SerializeField]
     private float spawnTime;        // 적 스폰 시간
     [SerializeField]
@@ -32,9 +32,9 @@ public class EnemySpawner : MonoBehaviour
         while(spawnCount < enemyMaxCount)
         {
             spawnCount++;
-            GameObject enemy = Instantiate(enemyPrafab[currentIndex]);
-            EnemyController enemyController = enemy.GetComponent<EnemyController>();
-            if(enemyController != null)
+            //GameObject enemy = Instantiate(enemyInfos[currentIndex]);
+            var enemy = Manager.Instance.Spawn(enemyInfos[currentIndex].idName);
+            if(enemy.TryGetComponent<EnemyController>(out var enemyController))
             {
                 enemyController.SetUp(wayPoints);
             }

@@ -7,7 +7,7 @@ public class UnitSpawner : MonoBehaviour
 {
     public static UnitSpawner Instance;
 
-    public GameObject playerUnit; 
+    public List<string> unitIDList = new List<string>(); 
 
     private void Awake()
     {
@@ -16,10 +16,25 @@ public class UnitSpawner : MonoBehaviour
     }
 
 
-    public void CreateUnit()
+    public void ButtonEventCreateUnit()
     {
-        var unit = Instantiate(playerUnit); 
+        int rand = Random.Range(0, unitIDList.Count);
+
+        CreateUnit(unitIDList[rand]); 
+    }
+
+    public void CreateUnit(string name)
+    {
+        //var unit = Instantiate(playerUnit); 
+        var unit = Manager.Instance.Spawn(name);
+
+        if(unit.TryGetComponent<PlayerUnit>(out PlayerUnit playerUnit))
+        {
+            playerUnit.transform.position = this.transform.position; 
+        }
 
     }
 
+
+    
 }

@@ -1,8 +1,17 @@
+using Redcode.Pools;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+
+public enum DefenseType
+{
+    IMPACT,         // 충격
+    SPECIAL,        // 특수
+    MANUFACTURING,  // 가공
+}
+
+public class EnemyController : ObjectPoolInfo, IPoolObject
 {
     public float speed;
     public Rigidbody2D rigid;
@@ -10,13 +19,14 @@ public class EnemyController : MonoBehaviour
 
     bool isLive;
 
-
     private Vector3 moveDirection;
 
     private int wayPointCount;  // 이동 경로 개수
     private Transform[] wayPoints; // 이동 경로 배열; 
     private int currentIndex = 0;   // 현재 목표 지점 인덱스 값
-    
+
+    public DefenseType defenseType;
+
 
     private void Awake()
     {
@@ -36,6 +46,14 @@ public class EnemyController : MonoBehaviour
         NextMoveTo(); 
     }
 
+    public void OnCreatedInPool()
+    {
+    }
+
+    public void OnGettingFromPool()
+    {
+    }
+
     public void SetUp(Transform[] wayPoints)
     {
         wayPointCount = wayPoints.Length;
@@ -49,7 +67,7 @@ public class EnemyController : MonoBehaviour
 
     public void NextMoveTo()
     {
-        // 현재 waypoints와 거리가 0.02 * spee 보다 작다면 실행
+        // 현재 waypoints와 거리가 0.02 * speed 보다 작다면 실행
         // 이유는 속도가 빠르면 한 프레임에 0.02보다 크게 움직이기 때문에 
         // if문에 걸리지 않고 경로를 탈주하는 오브젝트가 발생할 수 있다. 
         if(Vector3.Distance(transform.position, wayPoints[currentIndex].position) > 0.02f * speed)
@@ -67,4 +85,6 @@ public class EnemyController : MonoBehaviour
             currentIndex = 0; // 0으로 초기화 
         }
     }
+
+   
 }

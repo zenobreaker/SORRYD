@@ -133,6 +133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34b62e9bda416634d9c42982193af58c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idName: NormalBullet
   target: {fileID: 0}
   sprite: {fileID: 168565440303376694}
   speed: 5
