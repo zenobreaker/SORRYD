@@ -124,6 +124,8 @@ MonoBehaviour:
   speed: 0.8
   rigid: {fileID: 7616368070380556014}
   spriteRenderer: {fileID: 1188961971432833583}
+  hp: 10
+  currentHP: 0
   defenseType: 0
 --- !u!61 &2369048653969749382
 BoxCollider2D:

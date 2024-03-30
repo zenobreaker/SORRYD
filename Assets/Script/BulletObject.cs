@@ -21,8 +21,8 @@ public class BulletObject : ObjectPoolInfo, IPoolObject
     public float speed; // 총알 속도
     public int power;     // 총알 위력
     public GameObject bomoEffect; // 폭발 이펙트 
-    public BulletType type;
-
+    public UnitType unitType;
+    public BulletType bulletType;
 
     public void OnCreatedInPool()
     {
@@ -38,7 +38,7 @@ public class BulletObject : ObjectPoolInfo, IPoolObject
     {
         sprite = GetComponent<SpriteRenderer>(); 
     }
-    // Start is called before the first frame update
+
     void Start()
     {
         if(sprite != null)
@@ -47,7 +47,6 @@ public class BulletObject : ObjectPoolInfo, IPoolObject
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(target != null)
@@ -60,6 +59,14 @@ public class BulletObject : ObjectPoolInfo, IPoolObject
             {
                 // 오브젝트 반납 
                 Manager.Instance.ReturnPool(this);
+
+                // 적에게 데미지를 주는지, 아니면 추가 오브젝트를 생성하는지
+                 if(target.TryGetComponent(out EnemyController enemy))
+                {
+                    enemy.Damaged(unitType, power);
+                }
+
+
             }
         }
     }
@@ -71,6 +78,11 @@ public class BulletObject : ObjectPoolInfo, IPoolObject
             return false;
         }
         return true; 
+    }
+
+    public void SetUnitType(UnitType type)
+    {
+        unitType = type;
     }
 
     public void SetPower(int power)

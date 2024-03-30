@@ -220,6 +220,7 @@ public class PlayerUnit : ObjectPoolInfo, IPoolObject
         bulletObj.transform.position = this.transform.position;
         if (bulletObj.TryGetComponent<BulletObject>(out var bullet))
         {
+            bullet.SetUnitType(unitInfo.unitType);
             bullet.SetPower(CalcUnitPower()); 
             bullet.SetTarget(target);
         }

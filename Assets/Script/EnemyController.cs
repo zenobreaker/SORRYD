@@ -1,4 +1,5 @@
 using Redcode.Pools;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,13 +12,25 @@ public enum DefenseType
     MANUFACTURING,  // 가공
 }
 
-public class EnemyController : ObjectPoolInfo, IPoolObject
+public interface IDamageable
+{
+    public void Damaged(UnitType unitType, int value);
+}
+
+public class EnemyController : ObjectPoolInfo, IPoolObject, IDamageable
 {
     public float speed;
     public Rigidbody2D rigid;
     public SpriteRenderer spriteRenderer;
 
     bool isLive;
+
+
+    public int hp;
+    public int currentHP;
+
+    // 적이 죽었을 때 발생하는 이벤트
+    public event EventHandler EnemyDied;
 
     private Vector3 moveDirection;
 
@@ -27,13 +40,24 @@ public class EnemyController : ObjectPoolInfo, IPoolObject
 
     public DefenseType defenseType;
 
+    public Collider2D myCollider;
+
 
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        myCollider = GetComponent<Collider2D>(); 
     }
 
+    private void Update()
+    {
+        // 체력이 0이하가 되면 매니저에게 반환
+        if(currentHP <= 0)
+        {
+            OnEnemyDied();
+        }
+    }
 
     private void FixedUpdate()
     {
@@ -52,6 +76,8 @@ public class EnemyController : ObjectPoolInfo, IPoolObject
 
     public void OnGettingFromPool()
     {
+        if(myCollider != null)
+            myCollider.enabled = false; 
     }
 
     public void SetUp(Transform[] wayPoints)
@@ -63,6 +89,9 @@ public class EnemyController : ObjectPoolInfo, IPoolObject
         // 현재 위치를 wayPonts의 첫 번재로 설정
         currentIndex = 0;
         transform.position = wayPoints[currentIndex].position;
+        if(myCollider != null)
+            myCollider.enabled = true; 
+        currentHP = hp;
     }
 
     public void NextMoveTo()
@@ -86,5 +115,50 @@ public class EnemyController : ObjectPoolInfo, IPoolObject
         }
     }
 
-   
+    public void Damaged(UnitType unitType, int value)
+    {
+        switch(unitType)
+        {
+            case UnitType.EXPLOSIVE:
+                // 폭발형 공격은 충격방어에 효과적
+                // 대신 가공 방어엔 취약 
+                if( defenseType  == DefenseType.IMPACT)
+                {
+                    value *= (int)2.0f; 
+                }
+                else if(defenseType == DefenseType.MANUFACTURING)
+                {
+                    value *= (int)0.5f;
+                }
+
+                break;
+            case UnitType.PIERCE:
+                // 관통형 공격은 특수방어에 효과적 
+                // 대신 충격 방어엔 취약
+                if (defenseType == DefenseType.SPECIAL)
+                {
+                    value *= (int)2.0f;
+                }
+                else if (defenseType == DefenseType.IMPACT)
+                {
+                    value = Mathf.RoundToInt(value * 0.5f);
+                }
+                break;
+            case UnitType.NORMAL:
+                // 통상형 공격은 모든 방어타입에 한배로 공격
+                // 대신 자체적인 위력이 낮음
+                break;
+            default:
+                break; 
+        }
+
+        currentHP -= value;
+    }
+
+    public void OnEnemyDied()
+    {
+        if(myCollider != null)
+            myCollider.enabled = false; 
+        EnemyDied?.Invoke(this, EventArgs.Empty);
+    }
 }
