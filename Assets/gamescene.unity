@@ -304,11 +304,6 @@ MonoBehaviour:
     _count: 0
     _container: {fileID: 0}
     _nonLazy: 0
-  - _name: Enemy1
-    _component: {fileID: 3561569558500680220, guid: 624edeae7600e3f47b0e8e1cf194a0d8, type: 3}
-    _count: 0
-    _container: {fileID: 0}
-    _nonLazy: 0
 --- !u!1 &115287842
 GameObject:
   m_ObjectHideFlags: 0
@@ -2572,6 +2567,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1496329176}
   - component: {fileID: 1496329175}
+  - component: {fileID: 1496329177}
   m_Layer: 0
   m_Name: EnemySpawner
   m_TagString: Untagged
@@ -2591,6 +2587,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9056be9d290c07489754d4f7e9d3ba6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  poolManager: {fileID: 1496329177}
   enemyInfos:
   - {fileID: 3561569558500680220, guid: 624edeae7600e3f47b0e8e1cf194a0d8, type: 3}
   spawnTime: 0.5
@@ -2619,6 +2616,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1496329177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1496329174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 733f4e1ff483611408f4a8d4fc9202ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pools:
+  - _name: Enemy1
+    _component: {fileID: 3561569558500680220, guid: 624edeae7600e3f47b0e8e1cf194a0d8, type: 3}
+    _count: 0
+    _container: {fileID: 1496329176}
+    _nonLazy: 1
 --- !u!1 &1591116911
 GameObject:
   m_ObjectHideFlags: 0
