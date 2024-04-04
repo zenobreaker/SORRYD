@@ -24,6 +24,8 @@ public class EnemySpawner : MonoBehaviour
     public bool isBossRound;    // 현재 보스가 등장하는 라운드인지 체크 
     Coroutine spawnCoroutine;
 
+    public bool isSpawnEnd = false;
+
     private void Awake()
     {
         poolManager = GetComponent<PoolManager>(); 
@@ -44,30 +46,51 @@ public class EnemySpawner : MonoBehaviour
     // 적 소환
     IEnumerator SpawnEnemy(int currentIndex)
     {
-        int spawnCount = 0; 
-        while(spawnCount < enemyMaxCount)
+        isSpawnEnd = false; 
+        int spawnCount = 0;
+        
+        if (currentIndex < enemyInfos.Length)
         {
-            spawnCount++;
-            //GameObject enemy = Instantiate(enemyInfos[currentIndex]);
-            //var enemy = Manager.Instance.Spawn(enemyInfos[currentIndex].idName);
-            var enemy = EnemySpawn(enemyInfos[currentIndex].idName);
-            if (enemy.TryGetComponent<EnemyController>(out var enemyController))
+            while (spawnCount < enemyMaxCount)
             {
-                currentEnemyCount++; 
-                enemyController.SetUp(wayPoints);
-                enemyController.EnemyDied += HandleEnemyDied;
-            }
+                spawnCount++;
+                var enemy = EnemySpawn(enemyInfos[currentIndex].idName);
+                if (enemy.TryGetComponent<EnemyController>(out var enemyController))
+                {
+                    currentEnemyCount++;
+                    enemyController.SetUp(wayPoints);
+                    enemyController.EnemyDied += HandleEnemyDied;
+                }
 
-            yield return new WaitForSeconds(spawnTime);
+                yield return new WaitForSeconds(spawnTime);
+            }
         }
+        
+        yield return null;
+
+        isSpawnEnd = true; 
+        StopCoroutine(spawnCoroutine);
+        spawnCoroutine = null;
     }
  
     public void HandleEnemyDied(object sender, EventArgs e)
     {
-        //Manager.Instance.ReturnPool((ObjectPoolInfo)sender);
         var info = sender as ObjectPoolInfo;
         if (info != null)
             poolManager.TakeToPool<ObjectPoolInfo>(info.idName, info);
         currentEnemyCount -= 1;
+    }
+
+    public bool CheckMaxEnemyCount()
+    {
+        if (currentEnemyCount >= enemyMaxCount)
+            return true;
+        else
+            return false; 
+    }
+
+    public bool CheckBossRound()
+    {
+        return isBossRound;
     }
 }

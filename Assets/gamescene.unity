@@ -336,6 +336,8 @@ MonoBehaviour:
   money: 0
   spawner: {fileID: 1496329175}
   unitSpawner: {fileID: 394889157}
+  currentRound: 0
+  maxRound: 1
 --- !u!4 &115287844
 Transform:
   m_ObjectHideFlags: 0
@@ -344,7 +346,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 115287842}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.2725382, y: 0.41223818, z: -0.032114677}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2598,9 +2600,10 @@ MonoBehaviour:
   - {fileID: 1843373893}
   - {fileID: 896091301}
   currentEnemyCount: 0
-  enemyMaxCount: 1
+  enemyMaxCount: 20
   enemyCurrentSpawnIndex: 0
   isBossRound: 0
+  isSpawnEnd: 0
 --- !u!4 &1496329176
 Transform:
   m_ObjectHideFlags: 0

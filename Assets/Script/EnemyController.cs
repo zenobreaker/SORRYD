@@ -40,14 +40,11 @@ public class EnemyController : ObjectPoolInfo, IPoolObject, IDamageable
 
     public DefenseType defenseType;
 
-    public Collider2D myCollider;
-
 
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        myCollider = GetComponent<Collider2D>(); 
     }
 
     private void Update()
@@ -76,8 +73,6 @@ public class EnemyController : ObjectPoolInfo, IPoolObject, IDamageable
 
     public void OnGettingFromPool()
     {
-        if(myCollider != null)
-            myCollider.enabled = false; 
     }
 
     public void SetUp(Transform[] wayPoints)
@@ -89,8 +84,7 @@ public class EnemyController : ObjectPoolInfo, IPoolObject, IDamageable
         // 현재 위치를 wayPonts의 첫 번재로 설정
         currentIndex = 0;
         transform.position = wayPoints[currentIndex].position;
-        if(myCollider != null)
-            myCollider.enabled = true; 
+      
         currentHP = hp;
     }
 
@@ -157,8 +151,6 @@ public class EnemyController : ObjectPoolInfo, IPoolObject, IDamageable
 
     public void OnEnemyDied()
     {
-        if(myCollider != null)
-            myCollider.enabled = false; 
         EnemyDied?.Invoke(this, EventArgs.Empty);
     }
 }
