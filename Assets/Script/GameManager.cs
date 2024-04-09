@@ -28,8 +28,14 @@ public class GameManager : MonoBehaviour
     public int maxRound;        // 최대 라운드 
 
     RoundState roundState;
-    float roundTimer;
+    public float maxRoundTimer;
+    public float maxBossRoundTimer; 
+    public float roundTimer;
     Coroutine roundTimerCoroutine;
+    Coroutine timerCoroutine;
+
+    bool isBossRound; // 보스 라운드인지 확인하는 플래그 값 
+
     private void Awake()
     {
         if (instance == null)
@@ -56,19 +62,48 @@ public class GameManager : MonoBehaviour
                 unitSpawner.CreateUnit("Unit1");
             }
         }
+    } 
+
+    void SetRoundTimerValue()
+    {
+        if (isBossRound == true)
+        {
+            roundTimer = maxBossRoundTimer;
+        }
+        else
+        {
+            roundTimer = maxRoundTimer;
+        }
     }
 
+    IEnumerator CoRoundTimer()
+    {
+        while (roundTimer >= 0)
+        {
+            roundTimer -= Time.deltaTime;
+            yield return null;
+        }
+
+        yield return null;
+        StopCoroutine(CoRoundTimer());
+        timerCoroutine = null;
+    }
 
     IEnumerator RoundTimer()
     {
         // 라운드 시작 
         if (currentRound >= maxRound)
             yield break;    // 최대 라운드를 넘겼다면 게임 진행 불가
-       
+
+        Debug.Log("현재 라운드 " + currentRound);
         // 적 생성 
         spawner.StartSpwan(currentRound);
 
-        yield return new WaitForSeconds(roundTimer);
+        SetRoundTimerValue();
+
+        StartCoroutine(CoRoundTimer());
+
+        yield return new WaitUntil(()=> roundTimer <= 0.0f);
 
         currentRound++;
         StopCoroutine(roundTimerCoroutine);

@@ -21,7 +21,6 @@ public class EnemySpawner : MonoBehaviour
     public int currentEnemyCount; // 현재 소환된 적 개수
     public int enemyMaxCount;       // 적마다 소환하는 최대 수치
     public int enemyCurrentSpawnIndex;  // 현재 소환하는 적 index 값
-    public bool isBossRound;    // 현재 보스가 등장하는 라운드인지 체크 
     Coroutine spawnCoroutine;
 
     public bool isSpawnEnd = false;
@@ -33,8 +32,7 @@ public class EnemySpawner : MonoBehaviour
 
     public void StartSpwan(int currentIndex)
     {
-        if(spawnCoroutine == null)
-            spawnCoroutine = StartCoroutine(SpawnEnemy(currentIndex));
+         StartCoroutine(SpawnEnemy(currentIndex));
     }
 
 
@@ -69,7 +67,7 @@ public class EnemySpawner : MonoBehaviour
         yield return null;
 
         isSpawnEnd = true; 
-        StopCoroutine(spawnCoroutine);
+        //StopCoroutine(spawnCoroutine);
         spawnCoroutine = null;
     }
  
@@ -89,8 +87,4 @@ public class EnemySpawner : MonoBehaviour
             return false; 
     }
 
-    public bool CheckBossRound()
-    {
-        return isBossRound;
-    }
 }

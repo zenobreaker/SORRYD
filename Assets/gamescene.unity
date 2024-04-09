@@ -337,7 +337,10 @@ MonoBehaviour:
   spawner: {fileID: 1496329175}
   unitSpawner: {fileID: 394889157}
   currentRound: 0
-  maxRound: 1
+  maxRound: 4
+  maxRoundTimer: 10
+  maxBossRoundTimer: 30
+  roundTimer: 0
 --- !u!4 &115287844
 Transform:
   m_ObjectHideFlags: 0
@@ -2592,6 +2595,10 @@ MonoBehaviour:
   poolManager: {fileID: 1496329177}
   enemyInfos:
   - {fileID: 3561569558500680220, guid: 624edeae7600e3f47b0e8e1cf194a0d8, type: 3}
+  - {fileID: 4508737357146199582, guid: d57eacdc58bc2344388f2d553289b078, type: 3}
+  - {fileID: 4440855049087131404, guid: 84d250a44463dbb4eb4d77dec7781ba8, type: 3}
+  - {fileID: 8096228870930572510, guid: e492f2cf512712249a83716bf2bcbc4d, type: 3}
+  - {fileID: 8799209857287316319, guid: ca015945924770c4b8aed924a240a2c8, type: 3}
   spawnTime: 0.5
   wayPoints:
   - {fileID: 148228782}
@@ -2602,7 +2609,6 @@ MonoBehaviour:
   currentEnemyCount: 0
   enemyMaxCount: 20
   enemyCurrentSpawnIndex: 0
-  isBossRound: 0
   isSpawnEnd: 0
 --- !u!4 &1496329176
 Transform:
@@ -2634,6 +2640,26 @@ MonoBehaviour:
   _pools:
   - _name: Enemy1
     _component: {fileID: 3561569558500680220, guid: 624edeae7600e3f47b0e8e1cf194a0d8, type: 3}
+    _count: 0
+    _container: {fileID: 1496329176}
+    _nonLazy: 1
+  - _name: Enemy2
+    _component: {fileID: 4508737357146199582, guid: d57eacdc58bc2344388f2d553289b078, type: 3}
+    _count: 0
+    _container: {fileID: 1496329176}
+    _nonLazy: 1
+  - _name: Enemy3
+    _component: {fileID: 4440855049087131404, guid: 84d250a44463dbb4eb4d77dec7781ba8, type: 3}
+    _count: 0
+    _container: {fileID: 1496329176}
+    _nonLazy: 1
+  - _name: Enemy4
+    _component: {fileID: 8096228870930572510, guid: e492f2cf512712249a83716bf2bcbc4d, type: 3}
+    _count: 0
+    _container: {fileID: 1496329176}
+    _nonLazy: 1
+  - _name: Enemy5
+    _component: {fileID: 8799209857287316319, guid: ca015945924770c4b8aed924a240a2c8, type: 3}
     _count: 0
     _container: {fileID: 1496329176}
     _nonLazy: 1
