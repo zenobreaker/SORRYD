@@ -127,6 +127,7 @@ MonoBehaviour:
   hp: 10
   currentHP: 0
   defenseType: 0
+  dropCoin: 3
 --- !u!61 &3395697809503502724
 BoxCollider2D:
   m_ObjectHideFlags: 0

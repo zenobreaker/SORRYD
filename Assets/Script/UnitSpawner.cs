@@ -30,7 +30,10 @@ public class UnitSpawner : MonoBehaviour
 
         if(unit.TryGetComponent<PlayerUnit>(out PlayerUnit playerUnit))
         {
-            playerUnit.transform.position = this.transform.position; 
+            playerUnit.transform.position = this.transform.position;
+
+            // 유닛매니저에 내 유닛 추가
+            UnitManager.instance.AddMyUnit(playerUnit);
         }
 
     }

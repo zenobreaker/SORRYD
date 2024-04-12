@@ -55,6 +55,11 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        if(Input.GetKeyDown(KeyCode.V))
+        {
+            money = 9999;
+        }
+
         if(Input.GetKeyDown(KeyCode.Space))
         {
             if(unitSpawner != null)
@@ -62,7 +67,19 @@ public class GameManager : MonoBehaviour
                 unitSpawner.CreateUnit("Unit1");
             }
         }
-    } 
+    }
+
+    public void UseMoney(int value)
+    {
+        money -= value;
+        if (money <= 0)
+            money = 0; 
+    }
+
+    public float GetRoundRemainTime()
+    {
+        return roundTimer;
+    }
 
     void SetRoundTimerValue()
     {
@@ -80,7 +97,7 @@ public class GameManager : MonoBehaviour
     {
         while (roundTimer >= 0)
         {
-            roundTimer -= Time.deltaTime;
+            roundTimer -= Time.unscaledDeltaTime;
             yield return null;
         }
 
@@ -101,7 +118,8 @@ public class GameManager : MonoBehaviour
 
         SetRoundTimerValue();
 
-        StartCoroutine(CoRoundTimer());
+        if(timerCoroutine == null)
+            timerCoroutine  = StartCoroutine(CoRoundTimer());
 
         yield return new WaitUntil(()=> roundTimer <= 0.0f);
 

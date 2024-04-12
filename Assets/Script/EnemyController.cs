@@ -40,6 +40,7 @@ public class EnemyController : ObjectPoolInfo, IPoolObject, IDamageable
 
     public DefenseType defenseType;
 
+    public int dropCoin;
 
     private void Awake()
     {
@@ -69,6 +70,7 @@ public class EnemyController : ObjectPoolInfo, IPoolObject, IDamageable
 
     public void OnCreatedInPool()
     {
+        
     }
 
     public void OnGettingFromPool()
@@ -152,5 +154,11 @@ public class EnemyController : ObjectPoolInfo, IPoolObject, IDamageable
     public void OnEnemyDied()
     {
         EnemyDied?.Invoke(this, EventArgs.Empty);
+        DropCoin();
+    }
+
+    void DropCoin()
+    {
+        GameManager.instance.money += dropCoin;
     }
 }
