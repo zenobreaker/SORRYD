@@ -18,6 +18,7 @@ public enum UnitGrade
     UNIQUE,
     LEGEND,
     MYTH,
+    MAX = MYTH,
 }
 
 [System.Serializable]

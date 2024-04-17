@@ -11,23 +11,25 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     [Header("게임머니")]
-    public int money; 
+    public int money;
+
+    public int START_GAME_MONEY = 300;
 
     public EnemySpawner spawner;
 
     public UnitSpawner unitSpawner;
     
-    enum  RoundState
+    enum  GameState
     {
         READY,
-        START,
+        GAME_PLAY,
         END,
     }
 
     public int currentRound;    // 현재 진행중인 라운드 
     public int maxRound;        // 최대 라운드 
 
-    RoundState roundState;
+    GameState gameState;
     public float maxRoundTimer;
     public float maxBossRoundTimer; 
     public float roundTimer;
@@ -44,8 +46,23 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (roundTimerCoroutine == null)
-            roundTimerCoroutine = StartCoroutine(RoundTimer());
+
+        if(gameState == GameState.READY)
+        {
+            SetGameMoney();
+            gameState = GameState.GAME_PLAY;
+        }
+        else if(gameState == GameState.GAME_PLAY)
+        {
+            if (roundTimerCoroutine == null)
+                roundTimerCoroutine = StartCoroutine(RoundTimer());
+        }
+        else
+        {
+
+        }
+
+   
       
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -67,6 +84,11 @@ public class GameManager : MonoBehaviour
                 unitSpawner.CreateUnit("Unit1");
             }
         }
+    }
+
+    public void SetGameMoney()
+    {
+        money = START_GAME_MONEY;
     }
 
     public void UseMoney(int value)

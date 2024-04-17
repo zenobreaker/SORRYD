@@ -1,0 +1,39 @@
+{
+  "sdConstData": [
+    {
+      "id": "1",
+      "grade": "1",
+      "sellValue": "10",
+      "appearRate": "0.54",
+      "sellable": "1"
+    },
+    {
+      "id": "2",
+      "grade": "2",
+      "sellValue": "30",
+      "appearRate": "0.3",
+      "sellable": "1"
+    },
+    {
+      "id": "3",
+      "grade": "3",
+      "sellValue": "50",
+      "appearRate": "0.1",
+      "sellable": "1"
+    },
+    {
+      "id": "4",
+      "grade": "4",
+      "sellValue": "100",
+      "appearRate": "0.05",
+      "sellable": "1"
+    },
+    {
+      "id": "5",
+      "grade": "5",
+      "sellValue": "0",
+      "appearRate": "0.01",
+      "sellable": "0"
+    }
+  ]
+}
