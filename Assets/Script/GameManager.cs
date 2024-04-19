@@ -56,10 +56,18 @@ public class GameManager : MonoBehaviour
         {
             if (roundTimerCoroutine == null)
                 roundTimerCoroutine = StartCoroutine(RoundTimer());
+
+            // todo 보스라운드에 대한 정보를 전달하는 기능이 필요하다.
+            if (CheckFinalRoundClear() == true)
+            {
+                Debug.Log($"All Clear!!!");
+                StopCoroutine(roundTimerCoroutine);
+                gameState = GameState.END;
+            }
         }
         else
         {
-
+            // todo 종료 로직  
         }
 
    
@@ -119,12 +127,12 @@ public class GameManager : MonoBehaviour
     {
         while (roundTimer >= 0)
         {
-            roundTimer -= Time.unscaledDeltaTime;
+            roundTimer -= Time.deltaTime;
             yield return null;
         }
-
+        
         yield return null;
-        StopCoroutine(CoRoundTimer());
+        StopCoroutine(timerCoroutine);
         timerCoroutine = null;
     }
 
@@ -134,25 +142,51 @@ public class GameManager : MonoBehaviour
         if (currentRound >= maxRound)
             yield break;    // 최대 라운드를 넘겼다면 게임 진행 불가
 
+        
+
         Debug.Log("현재 라운드 " + currentRound);
         // 적 생성 
         spawner.StartSpwan(currentRound);
 
         SetRoundTimerValue();
 
-        if(timerCoroutine == null)
-            timerCoroutine  = StartCoroutine(CoRoundTimer());
+        timerCoroutine ??= StartCoroutine(CoRoundTimer());
 
-        yield return new WaitUntil(()=> roundTimer <= 0.0f);
+        yield return new WaitUntil(() => roundTimer <= 0.0f);
 
         currentRound++;
+        StopCoroutine(timerCoroutine);
+        timerCoroutine = null;
+        // 0419 버그 - 위 두줄이 없으면 currentRound 값이 2에서 멈추며 타이머값이 줄어들지않는다.
+        // 아래 코드가 없으면 코루틴이 중첩되거나 update 문에서 이미 존재하는지 확인하기 때문에
+        // 변수로 담은 코루틴 값이 null이 되지 않는다. yield 이후 내용이 존재하기 때문?
         StopCoroutine(roundTimerCoroutine);
-        roundTimerCoroutine = null; 
+        roundTimerCoroutine = null;
     }
 
     // 현재 필드에 몬스터가 최대로 있는지 검사 
     public bool CheckMaxEnemyCount()
     {
         return spawner == null || spawner.CheckMaxEnemyCount();
+    }
+
+
+    // 마지막 라운드를 클리어했는지 검사 
+    public bool CheckFinalRoundClear()
+    {
+        // 현재 라운드가 마지막 라운드인가
+        bool isCurrentRound = currentRound >= maxRound;
+
+        // 보스가 잡혔는가?
+        if(isBossRound == true)
+        {
+            // 몬스터 카운트가 0이면 다 잡힌것
+            if(spawner.CheckAllClearField() == true)
+            {
+                return true; 
+            }
+        }
+
+        return false; 
     }
 }

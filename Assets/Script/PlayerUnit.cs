@@ -25,7 +25,8 @@ public class PlayerUnit : ObjectPoolInfo, IPoolObject
 
     public int moveSpeed;
 
-    public ObjectPoolInfo bulletObject; 
+    //public ObjectPoolInfo bulletObject;
+    public string bulletID;
     public Rigidbody2D rb;
     private Transform targetTr; 
 
@@ -212,11 +213,27 @@ public class PlayerUnit : ObjectPoolInfo, IPoolObject
 
     void ShootBullet(Transform target)
     {
-        if (bulletObject == null || target == null)
+        if (target == null)
             return;
 
+        if(bulletID == "")
+        {
+            var typeName = "Normal"; 
+            if(unitInfo.unitType == UnitType.EXPLOSIVE)
+            {
+                typeName = "Explosive";
+            }
+            else if(unitInfo.unitType == UnitType.PIERCE)
+            {
+                typeName = "Pierce";
+            }
+
+            bulletID = "Common_" + typeName + "_Bullet";
+        }
         //var bulletObj = Instantiate(bulletPrafab, transform.position, Quaternion.identity);
-        var bulletObj = Manager.Instance.Spawn(bulletObject.idName);
+        var bulletObj = Manager.Instance.Spawn(bulletID);
+        if (bulletObj == null) return; 
+
         bulletObj.transform.position = this.transform.position;
         if (bulletObj.TryGetComponent<BulletObject>(out var bullet))
         {

@@ -129,4 +129,9 @@ public class EnemySpawner : MonoBehaviour
             return false; 
     }
 
+    public bool CheckAllClearField()
+    {
+        return currentEnemyCount <= 0;
+    }
+
 }
