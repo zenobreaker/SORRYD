@@ -25,7 +25,7 @@ public class EnemySpawner : MonoBehaviour
     public bool isSpawnEnd = false;
 
     [SerializeField]
-    EnemyInfoScriptalbe enemyInfoScriptalbe;
+    EnemyInfoScriptable enemyInfoScriptalbe;
 
     List<EnemyInfo> enemyInfoList = new List<EnemyInfo>();
     List<ObjectPoolInfo> enemyList = new List<ObjectPoolInfo>();
@@ -41,9 +41,9 @@ public class EnemySpawner : MonoBehaviour
         EnemySpawn();
     }
 
-    public void StartSpwan(int currentIndex)
+    public void StartSpwan(int round)
     {
-         StartCoroutine(SpawnEnemy(currentIndex));
+         StartCoroutine(SpawnEnemy(round));
     }
 
 
@@ -57,7 +57,7 @@ public class EnemySpawner : MonoBehaviour
             // 등장 개수만큼 만들기 
             if (data != null)
             {
-                // todo 다시하기 할 때 아래 로직을 좀 더 추가해야한다.
+                // TODO: 다시하기 할 때 아래 로직을 좀 더 추가해야한다.
                 for (int i = 0; i < data.appearCount; i++)
                 {
                     var poolInfo = poolManager.GetFromPool<ObjectPoolInfo>(data.enemyID);
@@ -76,12 +76,12 @@ public class EnemySpawner : MonoBehaviour
     }
 
     // 적 소환
-    IEnumerator SpawnEnemy(int currentIndex)
+    IEnumerator SpawnEnemy(int stageRound)
     {
         isSpawnEnd = false; 
         int spawnCount = 0;
-        
-       
+
+        int currentIndex = stageRound > 0 ? stageRound - 1 : 0; 
         if (currentIndex < enemyInfoList.Count)
         {
             while (spawnCount < enemyInfoList[currentIndex].appearCount)

@@ -559,8 +559,9 @@ MonoBehaviour:
   START_GAME_MONEY: 300
   spawner: {fileID: 1496329175}
   unitSpawner: {fileID: 394889157}
-  currentRound: 0
-  maxRound: 4
+  enemyInfoScriptable: {fileID: 11400000, guid: cb1822e2f57ee4f40861f49052423ebc, type: 2}
+  currentRound: 1
+  maxRound: 5
   maxRoundTimer: 5
   maxBossRoundTimer: 100
   roundTimer: 0
@@ -3813,7 +3814,7 @@ MonoBehaviour:
   - {fileID: 1843373893}
   - {fileID: 896091301}
   currentEnemyCount: 0
-  enemyMaxCount: 20
+  enemyMaxCount: 150
   enemyCurrentSpawnIndex: 0
   isSpawnEnd: 0
   enemyInfoScriptalbe: {fileID: 11400000, guid: cb1822e2f57ee4f40861f49052423ebc, type: 2}

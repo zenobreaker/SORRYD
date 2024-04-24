@@ -80,7 +80,7 @@ public class UnitManager : MonoBehaviour
             unitList.RemoveUnit(unit);
         }
 
-        // todo 유닛 판매 시, 해당하는 금액 받기 
+        // TODO: 유닛 판매 시, 해당하는 금액 받기 
     }
 
 

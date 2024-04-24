@@ -14,12 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemies:
   - enemyID: Enemy1
+    appearStage: 1
     appearCount: 20
+    isBossStage: 0
   - enemyID: Enemy2
+    appearStage: 2
     appearCount: 20
+    isBossStage: 0
   - enemyID: Enemy3
+    appearStage: 3
     appearCount: 20
+    isBossStage: 0
   - enemyID: Enemy4
+    appearStage: 4
     appearCount: 20
+    isBossStage: 0
   - enemyID: Enemy5
+    appearStage: 5
     appearCount: 1
+    isBossStage: 1
