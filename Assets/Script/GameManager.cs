@@ -234,7 +234,7 @@ public class GameManager : MonoBehaviour
         // 2.모든 라운드를 클리어했는지 체크 
         bool isAllClear = CheckFinalRoundClear();
        
-        if (isFailure == false)
+        if (isFailure == false && isAllClear == false )
             return;
 
         gameState = GameState.END;
