@@ -25,7 +25,7 @@ public class UnitSpawner : MonoBehaviour
             dataController = FindObjectOfType<DataController>();
     }
 
-    string GetUnitID(UnitType type, UnitGrade grade)
+    public string GetUnitID(UnitType type, UnitGrade grade)
     {
         string unitID;
         string first = "" ;
@@ -102,6 +102,7 @@ public class UnitSpawner : MonoBehaviour
     public void CheatCreateUnit(string name)
     {
         var unit = Manager.Instance.Spawn(name);
+        if (unit == null) return; 
 
         if (unit.TryGetComponent<PlayerUnit>(out PlayerUnit playerUnit))
         {

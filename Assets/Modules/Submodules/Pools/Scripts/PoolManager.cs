@@ -100,6 +100,13 @@ namespace Redcode.Pools
         /// <param name="name">Pool name.</param>
         /// <returns>Finded pool.</returns>
         public IPool<T> GetPool<T>(string name) where T : Component => (IPool<T>)_poolsObjects[_pools.FindIndex(p => p.Name == name)];
+        /// <summary>
+        /// Find pool by <paramref name="name"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <returns>Finded result of bool type</returns>
+        public bool FindPool<T>(string name) where T : Component => _pools.FindIndex(p => p.Name == name) > -1 ? true : false;
         #endregion
 
         #region Get from pool

@@ -84,13 +84,13 @@ public class GameManager : MonoBehaviour
             money = 9999;
         }
 
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            if(unitSpawner != null)
-            {
-                unitSpawner.CreateUnit("Unit1");
-            }
-        }
+        //if(Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    if(unitSpawner != null)
+        //    {
+        //        unitSpawner.CreateUnit("Unit1");
+        //    }
+        //}
     }
 
     public void SetGameMoney()
