@@ -6,9 +6,9 @@ using UnityEngine.UIElements;
 using Redcode.Pools;
 
 public enum BulletType
-{ 
+{
     SINGLE,
-    EXPLOSIVE,    
+    EXPLOSIVE,
 }
 
 
@@ -24,6 +24,9 @@ public class BulletObject : ObjectPoolInfo, IPoolObject
     public UnitType unitType;
     public BulletType bulletType;
 
+    public delegate void DoAction();
+    public DoAction OnDoAction;
+
     public void OnCreatedInPool()
     {
 
@@ -36,12 +39,12 @@ public class BulletObject : ObjectPoolInfo, IPoolObject
 
     private void Awake()
     {
-        sprite = GetComponent<SpriteRenderer>(); 
+        sprite = GetComponent<SpriteRenderer>();
     }
 
     void Start()
     {
-        if(sprite != null)
+        if (sprite != null)
         {
             sprite.flipX = true;
         }
@@ -49,23 +52,29 @@ public class BulletObject : ObjectPoolInfo, IPoolObject
 
     void Update()
     {
-        if(target != null)
+        if (target != null)
         {
             Vector2 dirVec = (target.position - transform.position).normalized;
             float angle = Mathf.Atan2(target.position.y, target.position.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-            transform.Translate(speed * Time.deltaTime * dirVec, Space.World); 
-            if(ArriveToTarget())
+            transform.Translate(speed * Time.deltaTime * dirVec, Space.World);
+            if (ArriveToTarget())
             {
                 // 오브젝트 반납 
                 Manager.Instance.ReturnPool(this);
 
                 // 적에게 데미지를 주는지, 아니면 추가 오브젝트를 생성하는지
-                 if(target.TryGetComponent(out EnemyController enemy))
+                if (target.TryGetComponent(out EnemyController enemy))
                 {
                     enemy.Damaged(unitType, power);
                 }
 
+                 // 이벤트 실행
+
+                if(OnDoAction != null)
+                {
+                    OnDoAction?.Invoke();
+                }
 
             }
         }
@@ -73,11 +82,11 @@ public class BulletObject : ObjectPoolInfo, IPoolObject
 
     public bool ArriveToTarget()
     {
-        if(Vector2.Distance(transform.position, target.position) > 0.02f * speed)
+        if (Vector2.Distance(transform.position, target.position) > 0.02f * speed)
         {
             return false;
         }
-        return true; 
+        return true;
     }
 
     public void SetUnitType(UnitType type)
@@ -87,7 +96,7 @@ public class BulletObject : ObjectPoolInfo, IPoolObject
 
     public void SetPower(int power)
     {
-        this.power = power; 
+        this.power = power;
     }
 
     public void SetTarget(Transform transform)
@@ -96,5 +105,10 @@ public class BulletObject : ObjectPoolInfo, IPoolObject
 
         this.target = transform;
     }
+
+    // 총알 프리팹에 폭발 프리팹 을 넣고
+    // 총알에 델리게이트 이벤트를 서넝ㄴ 
+    // 유닛이 생성될 때 혹은 총알을 쏠 때 델리게이트에 이벤트를 심어둔다
+    // 이벤트는 여러 효과를 구현한다.
 
 }
