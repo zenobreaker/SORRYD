@@ -62,7 +62,7 @@ public class ObjectPooler : Manager
             Debug.Log("소환 실패 : 데이터 없음");
             return null;
         }
-
+        
         return obj;
     }
 

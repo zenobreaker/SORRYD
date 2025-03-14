@@ -1,12 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEngine.Video;
 using Redcode.Pools;
-
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public enum State
 {
@@ -16,9 +13,11 @@ public enum State
 }
 
 
-public class PlayerUnit : ObjectPoolInfo, IPoolObject
+public class PlayerUnit 
+    : ObjectPoolInfo
+    , IPoolObject
 {
-    public UnitStatInfo unitInfo;
+    public UnitStatInfoScriptable unitInfo;
     public int upgradeCount; 
 
     public State state; 
@@ -33,11 +32,15 @@ public class PlayerUnit : ObjectPoolInfo, IPoolObject
     Vector2 destination = Vector2.zero;
     Coroutine attackCoroutine;
     public LayerMask targetLayer;
-    bool isAttacking = false; 
+    bool isAttacking = false;
+
+    public SpriteRenderer[] myObjs;
 
     public void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        myObjs = GetComponentsInChildren<SpriteRenderer>(true).Where(sr => 
+        sr.gameObject != this.gameObject).ToArray();
     }
 
     void Start()
@@ -88,6 +91,13 @@ public class PlayerUnit : ObjectPoolInfo, IPoolObject
 
     }
 
+
+    // 유닛 판매 
+    public void SellUnit()
+    {
+        GameManager.instance.IncreaseMoney(this.unitInfo.info.sellingValue);
+        Manager.Instance.ReturnPool(this); 
+    }
 
     // 지정한 위치에 도착했는지 검사 
     public void CheckArrive()
@@ -254,12 +264,26 @@ public class PlayerUnit : ObjectPoolInfo, IPoolObject
         isAttacking = false;
         attackCoroutine = null; 
     }
+    public void SelectUnit()
+    {
+        if (myObjs.Length <= 0) return;
+
+        myObjs[1].gameObject.SetActive(true);
+    }
+
+    public void UnselectUnit()
+    {
+        if (myObjs.Length <= 0) return;
+
+        myObjs[1].gameObject.SetActive(false);
+    }
+
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, unitInfo.attackRange);
+        if(unitInfo != null)
+            Gizmos.DrawWireSphere(transform.position, unitInfo.attackRange);
     }
 
-  
 }

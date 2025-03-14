@@ -17,52 +17,65 @@ public class CheatController : MonoBehaviour
     private void Awake()
     {
         inputField = GetComponent<TMP_InputField>();
-        
+
         unitSpawner = FindObjectOfType<UnitSpawner>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
 
     // 입력한 텍스트 내용을 기반으로 해당 기능 실현
     public void CheckCheatCommand()
     {
-        
+
         inputContext = inputField.text;
         Debug.Log("Writted inputContext : " + inputContext);
         string[] commandSplits = inputContext.Split(' ');
 
-        if(commandSplits.Length <= 0)
+        if (commandSplits.Length <= 0)
         {
-            return; 
+            return;
         }
 
+        // 입력 문자 전부 대문자로 변경함
+        commandSplits[0].ToUpper();
+        if (commandSplits.Length > 1)
+            commandSplits[1] = commandSplits[1].ToUpper();
+
+        if (commandSplits.Length > 2)
+            commandSplits[2] = commandSplits[2].ToUpper();
 
         string firstKey = commandSplits[0];
+        firstKey = firstKey.ToUpper();
 
-        switch(firstKey)
+        switch (firstKey)
         {
             case "CREATE_UNIT":
-            if(commandSplits.Length >= 3)
-            {
-                CheatCreateUnit(commandSplits[1], commandSplits[2]);
-            }
-            break; 
+                if (commandSplits.Length >= 3)
+                {
+                    CheatCreateUnit(commandSplits[1], commandSplits[2]);
+                }
+                break;
+            case "MONEY":
+                {
+                    CheatCreateMoney();
+                }
+                break;
         }
 
 
         // 입력한 내용 지우기
         inputField.text = "";
-
     }
+
 
     void CheatKeyAnalys(params string[] strings)
     {
-        foreach(string key in strings)
+        foreach (string key in strings)
         {
             // TODO: 여기서부터 치트작업..
 
@@ -75,54 +88,63 @@ public class CheatController : MonoBehaviour
             // create 키를 받으면 create 관련 함수 준비 
         }
     }
+    void CheatCreateMoney()
+    {
+        GameManager.instance.IncreaseMoney(100);
 
+        // Gamble 
+        GameManager.instance.IncreaseGambleMoney(0, 100);
+        GameManager.instance.IncreaseGambleMoney(1, 100);
+        GameManager.instance.IncreaseGambleMoney(2, 100);
+    }
 
-    void CheatCreateUnit( string unitType, string grade)
+    void CheatCreateUnit(string unitType, string grade)
     {
         Debug.Assert(unitSpawner != null, "Unit Spawner not finded");
 
         if (unitType == string.Empty || grade == string.Empty)
-            return; 
+            return;
 
-        string typeCommand = string.Empty; 
-        switch(unitType)
+        // 실제 이름으로 사용하는 문자열로 치환
+        string typeCommand = string.Empty;
+        switch (unitType)
         {
-            case "explosive":
-            typeCommand = "Explosive";
-            break;
-            case "normal":
-            typeCommand = "Normal";
-            break;
-            case "pirece":
-            typeCommand = "Pierce";
-            break;
+            case "EXPLOSIVE":
+                typeCommand = "Explosive";
+                break;
+            case "NORMAL":
+                typeCommand = "Normal";
+                break;
+            case "PIRECE":
+                typeCommand = "Pierce";
+                break;
 
         }
 
         string gradeCommand = string.Empty;
-        switch(grade)
+        switch (grade)
         {
-            case "rare":
-            gradeCommand = "Rare";
-            break;
-            case "unique":
-            gradeCommand = "Unique";
-            break;
-            case "legend":
-            gradeCommand = "Legend";
-            break;
-            case "myth":
-            gradeCommand = "Myth";
-            break;
-            case "common":
-            gradeCommand = "Common";
-            break;
+            case "RARE":
+                gradeCommand = "Rare";
+                break;
+            case "UNIQUE":
+                gradeCommand = "Unique";
+                break;
+            case "LEGEND":
+                gradeCommand = "Legend";
+                break;
+            case "MYTH":
+                gradeCommand = "Myth";
+                break;
+            case "COMMON":
+                gradeCommand = "Common";
+                break;
         }
 
         if (unitType == string.Empty || grade == string.Empty)
             return;
 
-        string commandName = typeCommand + "_" + gradeCommand; 
+        string commandName = typeCommand + "_" + gradeCommand;
         unitSpawner.CheatCreateUnit(commandName);
     }
 }

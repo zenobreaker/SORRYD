@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -10,21 +11,38 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+    public event Action OnMoneyChange;
+    public event Action OnGambleMoneyChange;
+
     [Header("게임머니")]
     public int money;
 
+    [Header("겜블")]
+    public int gamble_Normal_Money;
+    public int gamble_Rare_Money;
+    public int gamble_Legend_Money;
+
     public int START_GAME_MONEY = 300;
+    public int START_GAMBLE_MONEY = 0;
 
     public EnemySpawner spawner;
 
     public UnitSpawner unitSpawner;
-    
-    enum  GameState
+
+    enum GameState
     {
         READY,
         GAME_PLAY,
         END,
     }
+
+    enum GambleMoney
+    {
+        Normal,
+        Rare,
+        Legen,
+    }
+
     [SerializeField]
     EnemyInfoScriptable enemyInfoScriptable;
 
@@ -33,53 +51,58 @@ public class GameManager : MonoBehaviour
 
     GameState gameState;
     public float maxRoundTimer;
-    public float maxBossRoundTimer; 
+    public float maxBossRoundTimer;
     public float roundTimer;
     Coroutine roundTimerCoroutine;
     Coroutine timerCoroutine;
 
     bool isBossRound; // 보스 라운드인지 확인하는 플래그 값 
 
-    bool isWin; // 게임을 정상적으로 클리어했는지에 대한 플래그 값
+    private bool isWin; // 게임을 정상적으로 클리어했는지에 대한 플래그 값   
 
     private void Awake()
     {
         if (instance == null)
-            instance = this; 
+            instance = this;
+    }
+
+    void Start()
+    {
+        isWin = false; 
     }
 
     void Update()
     {
 
-        if(gameState == GameState.READY)
+        if (gameState == GameState.READY)
         {
             SetGameMoney();
             gameState = GameState.GAME_PLAY;
         }
-        else if(gameState == GameState.GAME_PLAY)
+        else if (gameState == GameState.GAME_PLAY)
         {
 
             if (roundTimerCoroutine == null)
                 roundTimerCoroutine = StartCoroutine(RoundTimer());
 
             ChangeGameStateToEnd();
-        }   
+        }
         else
         {
             // TODO: 종료 로직  
         }
 
-   
-      
+
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if(spawner != null)
+            if (spawner != null)
             {
                 spawner.StartSpwan(0);
             }
         }
 
-        if(Input.GetKeyDown(KeyCode.V))
+        if (Input.GetKeyDown(KeyCode.V))
         {
             money = 9999;
         }
@@ -96,13 +119,66 @@ public class GameManager : MonoBehaviour
     public void SetGameMoney()
     {
         money = START_GAME_MONEY;
+        gamble_Normal_Money = START_GAMBLE_MONEY;
+        gamble_Legend_Money = START_GAMBLE_MONEY;
+    }
+
+
+    public void IncreaseMoney(int value)
+    {
+        money += value;
+        OnMoneyChange?.Invoke();
     }
 
     public void UseMoney(int value)
     {
         money -= value;
-        if (money <= 0)
-            money = 0; 
+        Mathf.Clamp(money, 0, value);
+    }
+
+    public void IncreaseGambleMoney(int type, int value)
+    {
+        if ((GambleMoney)type == GambleMoney.Normal)
+            gamble_Normal_Money += value;
+        else if((GambleMoney)type == GambleMoney.Rare)
+            gamble_Rare_Money += value;
+        else
+            gamble_Legend_Money += value;
+
+        OnGambleMoneyChange?.Invoke();
+    }
+
+    public void UseGambleMoney(int value)
+    {
+        gamble_Normal_Money -= value;
+        Mathf.Clamp(gamble_Normal_Money, 0, value);
+        OnGambleMoneyChange?.Invoke();
+    }   
+        public void UseGambleRareMoney(int value)
+    {
+        gamble_Rare_Money -= value;
+        Mathf.Clamp(gamble_Rare_Money, 0, value);
+        OnGambleMoneyChange?.Invoke();
+    }
+
+    public void UseLegendGambleMoney(int value)
+    {
+        gamble_Legend_Money -= value;
+        Mathf.Clamp(gamble_Legend_Money, 0, value);
+        OnGambleMoneyChange?.Invoke();
+    }
+
+
+    public bool CanGambleMoney(int type, int enough)
+    {
+        if (type == 0)
+        {
+            return (gamble_Normal_Money >= enough);
+        }
+        else if(type == 1)
+            return (gamble_Rare_Money >= enough);
+
+        return (gamble_Legend_Money >= enough);
     }
 
     public float GetRoundRemainTime()
@@ -129,7 +205,7 @@ public class GameManager : MonoBehaviour
             roundTimer -= Time.deltaTime;
             yield return null;
         }
-        
+
         yield return null;
         StopCoroutine(timerCoroutine);
         timerCoroutine = null;
@@ -139,7 +215,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("현재 라운드 " + round);
 
-    
+
         SetRoundTimerValue();
 
         timerCoroutine ??= StartCoroutine(CoRoundTimer());
@@ -149,7 +225,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator RoundTimer()
     {
-       
+
         // 라운드 시작 
         if (currentRound > maxRound)
             yield break;    // 최대 라운드를 넘겼다면 게임 진행 불가
@@ -161,7 +237,7 @@ public class GameManager : MonoBehaviour
             isBossRound = enemyInfoScriptable.GetIsBossStage(currentRound);
         }
 
-        if(isBossRound == true)
+        if (isBossRound == true)
         {
             Debug.Log($"보스 라운드 시작");
         }
@@ -173,9 +249,9 @@ public class GameManager : MonoBehaviour
         timerCoroutine ??= StartCoroutine(CoRoundTimer());
 
         yield return new WaitUntil(() => roundTimer <= 0.0f);
-        
+
         // 라운드 수 증가 
-        currentRound++; 
+        currentRound++;
 
         StopCoroutine(timerCoroutine);
         timerCoroutine = null;
@@ -199,16 +275,16 @@ public class GameManager : MonoBehaviour
         {
             // 시간을 체크해야 한다.
             if (roundTimer <= 0)
-                return true; 
-            
+                return true;
+
         }
         // 일반 라운드라면 적이 일정 개수 이상 있다면 패배 
         else if (CheckMaxEnemyCount() == true)
         {
-            return true; 
+            return true;
         }
 
-        return false; 
+        return false;
     }
 
     // 마지막 라운드를 클리어했는지 검사 
@@ -219,10 +295,10 @@ public class GameManager : MonoBehaviour
         // 몬스터 카운트가 0이면 다 잡힌것
         if (isCurrentRound == true && spawner.CheckAllClearField() == true)
         {
-            return true; 
+            return true;
         }
-       
-        return false; 
+
+        return false;
     }
 
     public void ChangeGameStateToEnd()
@@ -233,14 +309,14 @@ public class GameManager : MonoBehaviour
 
         // 2.모든 라운드를 클리어했는지 체크 
         bool isAllClear = CheckFinalRoundClear();
-       
-        if (isFailure == false && isAllClear == false )
+
+        if (isFailure == false && isAllClear == false)
             return;
 
         gameState = GameState.END;
-        if(roundTimerCoroutine != null)
+        if (roundTimerCoroutine != null)
             StopCoroutine(roundTimerCoroutine);
-        if (isAllClear == true )
+        if (isAllClear == true)
         {
             isWin = true;
             Debug.Log($"All Clear!!!");

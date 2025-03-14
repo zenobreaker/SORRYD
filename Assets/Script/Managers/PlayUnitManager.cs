@@ -6,7 +6,7 @@ using UnityEngine;
 [SerializeField]
 public enum UnitType
 {
-    EXPLOSIVE,
+    EXPLOSIVE = 0,
     PIERCE,
     NORMAL,
 }
@@ -15,7 +15,7 @@ public enum UnitGrade
 {
     COMMON,
     RARE,
-    UNIQUE,
+    //UNIQUE,
     LEGEND,
     MYTH,
     MAX = MYTH,
@@ -35,8 +35,9 @@ public class UnitUpgradeInfo
     }
 }
 
-
-
+/// <summary>
+/// 유닛 업그레이드
+/// </summary>
 public class PlayUnitManager : MonoBehaviour
 {
     public static PlayUnitManager instance;

@@ -11,8 +11,7 @@ public class TouchManager : MonoBehaviour
 
     private Camera mainCamera;
     private Ray ray;
-    private RaycastHit2D hit;
-
+ 
     public GameObject selectUnit;
 
     private void Awake()
@@ -43,13 +42,13 @@ public class TouchManager : MonoBehaviour
             Vector2 mousePosition = Input.mousePosition;
             //
             var worldPoint = mainCamera.ScreenToWorldPoint(mousePosition);
-            hit = Physics2D.Raycast(worldPoint, Vector2.zero);
+            Collider2D hit = Physics2D.OverlapPoint(worldPoint);
 
-            if (hit.collider != null && hit.transform.CompareTag("Unit"))
+            if (hit != null && hit.transform.CompareTag("Unit"))
             {
                 SelectUnit(hit.transform);
             }
-            else 
+            else if(hit != null && hit.transform.CompareTag("Ground"))
             {
                 MoveSelectedUnit(mousePosition);
             }
@@ -59,13 +58,38 @@ public class TouchManager : MonoBehaviour
     // 선택한 유닛이 없으면 해당 유닛을 선택하는 기능
     public void SelectUnit(Transform transform)
     {
-        if(transform == null)
+        // 이전에 선택한 놈
+        if (selectUnit!= null && selectUnit.TryGetComponent<PlayerUnit>(out PlayerUnit prev))
+        {
+            prev.UnselectUnit();
+        }
+
+        if (transform == null)
         {
             selectUnit = null; 
             return; 
         }
-        Debug.Log("유닛 선택 : " + transform.name); 
-        selectUnit = transform.gameObject;
+
+        Debug.Log("유닛 선택 : " + transform.name);
+
+        if (transform.gameObject.TryGetComponent<PlayerUnit>(out var unit))
+        {
+            unit.SelectUnit();
+            selectUnit = transform.gameObject;
+        }
+    }
+
+    public PlayerUnit GetSelectUnit()
+    {
+        if (selectUnit == null)
+            return null; 
+         
+        if(selectUnit.TryGetComponent<PlayerUnit>(out PlayerUnit unit))
+        {
+            return unit;
+        }
+
+        return null;
     }
 
 

@@ -8,116 +8,79 @@ public class UnitSpawner : MonoBehaviour
     public static UnitSpawner Instance;
 
     public List<string> unitIDList = new List<string>();
+    public List<GameObject> spawnPoints = new List<GameObject>();
+
 
     public int SPAWN_UNIT_COST = 100;
 
     public DataController dataController;
+    public PlayerUnit playerUnitPrefab;
 
     private void Awake()
     {
         if (Instance == null)
-            Instance = this; 
+            Instance = this;
     }
 
     private void Start()
     {
-        if(dataController == null)
+        if (dataController == null)
             dataController = FindObjectOfType<DataController>();
     }
 
-    public string GetUnitID(UnitType type, UnitGrade grade)
-    {
-        string unitID;
-        string first = "" ;
-        string second; 
 
-        switch(type)
-        {
-            case UnitType.EXPLOSIVE:
-                first = "Explosive";
-                break;
-            case UnitType.NORMAL:
-                first = "Normal";
-                break;
-            case UnitType.PIERCE:
-                first = "Pierce";
-                break;
-        }
-
-        switch(grade)
-        {
-            case UnitGrade.RARE:
-                second = "Rare";
-                break;
-            case UnitGrade.UNIQUE:
-                second = "Unique";
-                break;
-            case UnitGrade.LEGEND:
-                second = "Legend";
-                break;
-            case UnitGrade.MYTH:
-                second = "Myth";
-                break;
-            default:
-                second = "Common";
-                break; 
-        }
-
-        unitID = first + "_" + second;
-
-        return unitID;
-    }
-
-    public void ButtonEventCreateUnit()
+   public void ButtonEventCreateUnit()
     {
         if (dataController == null)
             return;
 
-        // 1. 등급을 먼저 고른다. 
-        // 0부터 1 사이의 랜덤한 실수값을 가져와서 소수점 두 자리까지 반올림하여 처리
-        float gradeRand = Mathf.Round(Random.Range(0f, 1f) * 100f) / 100f;
 
-        // 1-1 전체 확률에서 결정해야한다.
-        float[] rates = dataController.GetUnitRates();
-        UnitGrade grade = UnitGrade.COMMON;
-        for(int i = 0; i < rates.Length; i++)
-        {
-            if(gradeRand <= rates[i])
-            {
-                grade = (UnitGrade)i;
-            }
-        }
-        Debug.Log($"Decide Grade : {grade}");
-
-        // 2. 해당 등급에서 공격타입 유닛을 고른다. 
-        int unitType = Random.Range(0, 3);
-
-        // 3. 등급과 유닛 공격타입으로 유닛 ID 가져오기
-        var unitID = GetUnitID((UnitType)unitType, grade);
+        var unitID = UnitManager.instance.GetRandomUnitID();
         Debug.Log($"Appear Unit ID : {unitID}");
-        CreateUnit(unitID); 
+
+        CreateUnit(unitID);
     }
 
 
     public void CheatCreateUnit(string name)
     {
-        var unit = Manager.Instance.Spawn(name);
-        if (unit == null) return; 
+        CreateUnit(name);
+    }
 
-        if (unit.TryGetComponent<PlayerUnit>(out PlayerUnit playerUnit))
+
+
+    Vector3 GetEmptySeat(PlayerUnit unit)
+    {
+        foreach (var spawnPoint in spawnPoints)
         {
-            playerUnit.transform.position = this.transform.position;
-
-            // 유닛매니저에 내 유닛 추가
-            UnitManager.instance.AddMyUnit(playerUnit);
+            if (IsOccupied(spawnPoint.transform.position) == false)
+                return spawnPoint.transform.position;
         }
+
+        return Vector3.zero;
+    }
+
+    bool IsOccupied(Vector3 position)
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(position, 0.5f);
+
+        foreach (var hit in hits)
+        {
+            if (hit.CompareTag("Unit"))
+            {
+                Debug.Log($"{hit.transform.name} is Exist");
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void CreateUnit(string name)
     {
         //var unit = Instantiate(playerUnit); 
         int money = GameManager.instance.money;
-        if(SPAWN_UNIT_COST > money)
+        if (SPAWN_UNIT_COST > money)
         {
             Debug.Log("코스트가 부족하여 유닛을 뽑을 수 없습니다.");
             return;
@@ -127,16 +90,43 @@ public class UnitSpawner : MonoBehaviour
 
         var unit = Manager.Instance.Spawn(name);
 
-        if(unit.TryGetComponent<PlayerUnit>(out PlayerUnit playerUnit))
+        if (unit.TryGetComponent<PlayerUnit>(out PlayerUnit playerUnit))
         {
-            playerUnit.transform.position = this.transform.position;
 
-            // 유닛매니저에 내 유닛 추가
-            UnitManager.instance.AddMyUnit(playerUnit);
+            playerUnit.unitInfo = dataController.GetUnitStatInfo(name);
+
+            // 소환된 리스트에 해당 유닛이 이미 있는지 검사
+            PlayerUnit findUnit = UnitManager.instance.FindUnit(ref playerUnit);
+            if (findUnit != null)
+            {
+                // 존재한다면 해당 리스트에 추가하고 끝
+                UnitManager.instance.AddMyUnit(playerUnit);
+
+                // 랜덤한 위치에 배치
+                // 랜덤한 위치 오프셋 적용 (겹치는 것 방지)
+                Vector2 randomOffset;
+                do
+                {
+                    randomOffset = Random.insideUnitCircle * 0.5f; // 반지름 0.5 안에서 랜덤 위치
+                } while (Physics2D.OverlapCircle(findUnit.transform.position + (Vector3)randomOffset, 0.2f, 1 << LayerMask.NameToLayer("Unit")));
+
+                playerUnit.transform.position = findUnit.transform.position + (Vector3)randomOffset;
+                return;
+            }
+
+            Vector3 spawnPosition = GetEmptySeat(playerUnit);
+            if (spawnPosition != Vector3.zero)
+            {
+                playerUnit.transform.position = spawnPosition;
+                // 유닛매니저에 내 유닛 추가
+                UnitManager.instance.AddMyUnit(playerUnit);
+            }
+            else
+            {
+                Debug.Log("빈 자리가 없음");
+            }
         }
 
     }
 
-
-    
 }

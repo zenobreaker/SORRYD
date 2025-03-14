@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cbef2f9c47987941a5f3f9b7ef5fd18, type: 3}
+  m_Name: Pierce_Myth
+  m_EditorClassIdentifier: Assembly-CSharp::UnitStatInfo
+  idname: Pierce_Myth
+  info:
+    grade: 0
+    sellingValue: 0
+  unitType: 0
+  attack: 95
+  additionalAttack: 0
+  attackSpeed: 0.75
+  additionalAttackSpeed: 0
+  attackRange: 20

@@ -44,7 +44,7 @@ public class DataController : MonoBehaviour
 
     public SDConstdataGroup dataGroup;
     public List<ConstData> dataList = new List<ConstData>();
-
+    public List<UnitStatInfoScriptable> unitDatas = new();
     void Start()
     {
         if (jsonData == null)
@@ -87,5 +87,12 @@ public class DataController : MonoBehaviour
         return rates; 
     }
 
+
+    public UnitStatInfoScriptable GetUnitStatInfo(string idName)
+    {
+        UnitStatInfoScriptable  unit = unitDatas.Find(x => x.idname == idName);
+     
+        return unit?.Clone();
+    }
 
 }
